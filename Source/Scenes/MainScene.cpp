@@ -83,6 +83,9 @@ bool MainScene::init()
         this->addChild(title, 1);
     }
 
+    // Create portrait zones in the upper part of the screen
+    createPortraitZones(visibleSize, origin);
+
     // add "HelloWorld" splash screen"
     //auto sprite = Sprite::create("HelloWorld.png"sv);
     //if (sprite == nullptr)
@@ -172,6 +175,46 @@ void MainScene::onKeyPressed(EventKeyboard::KeyCode code, Event* event)
 void MainScene::onKeyReleased(EventKeyboard::KeyCode code, Event* event)
 {
     AXLOGD("onKeyReleased, keycode: %d", static_cast<int>(code));
+}
+
+void MainScene::createPortraitZones(const ax::Size& visibleSize, const ax::Vec2& origin)
+{
+    // Calculate portrait zone dimensions with 2:3 aspect ratio
+    float portraitWidth = visibleSize.width * 0.15f; // 15% of screen width
+    float portraitHeight = portraitWidth * (3.0f / 2.0f); // 2:3 ratio (height is 3/2 of width)
+    
+    // Position in upper part of screen, centered horizontally
+    float startY = origin.y + visibleSize.height - portraitHeight - 50; // 50px from top
+    float leftX = origin.x + visibleSize.width * 0.25f - portraitWidth / 2; // Left portrait
+    float rightX = origin.x + visibleSize.width * 0.75f - portraitWidth / 2; // Right portrait
+    
+    // Create first portrait zone
+    _portrait1 = Sprite::create("Fe/Fe001/Out001/000_f.png");
+    if (_portrait1 == nullptr)
+    {
+        problemLoading("'Fe/Fe001/Out001/000_f.png'");
+    }
+    else
+    {
+        _portrait1->setPosition(Vec2(leftX, startY));
+        _portrait1->setScale(portraitWidth / _portrait1->getContentSize().width, 
+                           portraitHeight / _portrait1->getContentSize().height);
+        this->addChild(_portrait1, 2);
+    }
+    
+    // Create second portrait zone
+    _portrait2 = Sprite::create("Fe/Fe002/Out004/000_f.png");
+    if (_portrait2 == nullptr)
+    {
+        problemLoading("'Fe/Fe002/Out004/000_f.png'");
+    }
+    else
+    {
+        _portrait2->setPosition(Vec2(rightX, startY));
+        _portrait2->setScale(portraitWidth / _portrait2->getContentSize().width, 
+                           portraitHeight / _portrait2->getContentSize().height);
+        this->addChild(_portrait2, 2);
+    }
 }
 
 void MainScene::update(float delta)
