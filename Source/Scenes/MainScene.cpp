@@ -69,19 +69,7 @@ bool MainScene::init()
 
     // add a label shows "Hello World"
     // create and initialize a label
-
-    auto title = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    if (title == nullptr)
-    {
-        problemLoading("'fonts/Marker Felt.ttf'");
-    }
-    else
-    {
-        // position the label on the center of the screen
-        title->setPosition(
-            Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - title->getContentSize().height));
-        this->addChild(title, 1);
-    }
+    // (removed Hello World label)
 
     // Create portrait zones in the upper part of the screen
     createPortraitZones(visibleSize, origin);
