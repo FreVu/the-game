@@ -45,4 +45,6 @@ private:
     ax::EventListenerTouchAllAtOnce* _touchListener = nullptr;
     ax::EventListenerKeyboard* _keyboardListener    = nullptr;
     ax::EventListenerMouse* _mouseListener          = nullptr;
+
+    void flipCallback(ax::Object* sender);
 };

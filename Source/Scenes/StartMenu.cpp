@@ -271,6 +271,6 @@ void StartMenu::menuCloseCallback(ax::Object* sender)
 void StartMenu::menuStartCallback(ax::Object* sender)
 {
     AXLOG("Start button clicked");
+    //this->getEventDispatcher()->removeAllEventListeners();
     _director->replaceScene(utils::createInstance<MainScene>());
-    this->getEventDispatcher()->removeAllEventListeners();
 }
