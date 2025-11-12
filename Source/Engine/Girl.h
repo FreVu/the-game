@@ -1,10 +1,22 @@
+#pragma once
+
 #include "Outfit.h"
+
+#include <filesystem>
 
 class Girl
 {
 public:
-    Girl();
+
+    explicit Girl(std::filesystem::directory_entry directory);
+
+    std::string getFrontFile();
+
+    void flip();
+    void undress();
 
 private:
-    Outfit _outfit;
+
+    std::string _name;
+    Outfit* _outfit;
 };

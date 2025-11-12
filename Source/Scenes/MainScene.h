@@ -29,22 +29,20 @@ public:
     void menuCloseCallback(ax::Object* sender);
 
     // Portrait zones
-    void createPortraitZones(const ax::Size& visibleSize, const ax::Vec2& origin);
+    void createPortraitZones();
 
     MainScene();
     ~MainScene();
 
 private:
 
-    std::vector<Girl> _girls;
-    
     // Portrait zones
-    ax::Sprite* _portrait1 = nullptr;
-    ax::Sprite* _portrait2 = nullptr;
+    std::vector<ax::Sprite*> _portrait;
 
     ax::EventListenerTouchAllAtOnce* _touchListener = nullptr;
     ax::EventListenerKeyboard* _keyboardListener    = nullptr;
     ax::EventListenerMouse* _mouseListener          = nullptr;
 
-    void flipCallback(ax::Object* sender);
+    void flipCallback(ax::Object* sender, int index);
+    void nextCallback(ax::Object* sender, int index);
 };

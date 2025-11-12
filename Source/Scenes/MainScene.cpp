@@ -1,8 +1,12 @@
 #include "MainScene.h"
 
 #include "UI/UIButton.h"
-
 #include "UI/Helper.hpp"
+
+#include "Tools/FileSystemHelper.hpp"
+
+#include "Engine/GameData.h"
+#include "Engine/Girl.h"
 
 using namespace ax;
 
@@ -24,19 +28,7 @@ bool MainScene::init()
         return false;
     }
 
-    auto visibleSize = _director->getVisibleSize();
-    auto origin      = _director->getVisibleOrigin();
-    auto safeArea    = _director->getSafeAreaRect();
-    auto safeOrigin  = safeArea.origin;
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        Girl girl;  // TODO : girl creation
-        _girls.emplace_back(girl);
-    }
+    GameData::create();
 
     _mouseListener                = EventListenerMouse::create();
     _mouseListener->onMouseMove   = AX_CALLBACK_1(MainScene::onMouseMove, this);
@@ -51,7 +43,7 @@ bool MainScene::init()
     //_eventDispatcher->addEventListenerWithFixedPriority(_keyboardListener, 11);
 
     // Create portrait zones in the upper part of the screen
-    createPortraitZones(visibleSize, origin);
+    createPortraitZones();
 
     // scheduleUpdate() is required to ensure update(float) is called on every loop
     scheduleUpdate();
@@ -98,7 +90,6 @@ void MainScene::onMouseUp(Event* event)
 void MainScene::onMouseMove(Event* event)
 {
     EventMouse* e = static_cast<EventMouse*>(event);
-    AXLOGD("onMouseMove detected, X:{}  Y:{}", e->getCursorX(), e->getCursorY());
 }
 
 void MainScene::onMouseScroll(Event* event)
@@ -117,68 +108,83 @@ void MainScene::onKeyReleased(EventKeyboard::KeyCode code, Event* event)
     AXLOGD("onKeyReleased, keycode: %d", static_cast<int>(code));
 }
 
-void MainScene::createPortraitZones(const ax::Size& visibleSize, const ax::Vec2& origin)
+void MainScene::createPortraitZones()
 {
-    // Calculate portrait zone dimensions with 2:3 aspect ratio
-    float portraitWidth  = visibleSize.width * 0.15f;      // 15% of screen width
-    float portraitHeight = portraitWidth * (3.0f / 2.0f);  // 2:3 ratio (height is 3/2 of width)
+    const auto margin = 10;
+    auto screenSize   = _director->getVisibleSize();
+    auto screenOrigin = _director->getVisibleOrigin();
 
-    // Position in upper part of screen, centered horizontally
-    float startY = origin.y + visibleSize.height - portraitHeight - 50;       // 50px from top
-    float leftX  = origin.x + visibleSize.width * 0.25f - portraitWidth / 2;  // Left portrait
-    float rightX = origin.x + visibleSize.width * 0.75f - portraitWidth / 2;  // Right portrait
+    //const auto nbPortrait = 2;  // TODO
+    //std::vector<std::string> portraitFile = {"Fe/Fe001/Out001/000_f.png", "Fe/Fe002/Out004/000_f.png"};
 
-    // Create first portrait zone
-    _portrait1 = Sprite::create("Fe/Fe001/Out001/000_f.png");
-    if (_portrait1 == nullptr)
+    //  Calculate portrait zone dimensions with 2:3 aspect ratio
+    float portraitHeight = screenSize.height / 2.0f;
+    float portraitWidth  = portraitHeight * 2.0f / 3.0f;
+
+    float portraitY = screenOrigin.y + screenSize.height - portraitHeight / 2 - 50;
+
+    auto girls = GameData::getInstance()->getGirls();
+    for (unsigned i = 0; i < girls.size(); i++)
     {
-        problemLoading("'Fe/Fe001/Out001/000_f.png'");
-    }
-    else
-    {
-        _portrait1->setPosition(Vec2(leftX, startY));
-        _portrait1->setScale(portraitWidth / _portrait1->getContentSize().width,
-                             portraitHeight / _portrait1->getContentSize().height);
-        this->addChild(_portrait1, 2);
+        float portraitX = screenOrigin.x + screenSize.width * (i + 1) / (girls.size() + 1);
+
+        auto portrait = Sprite::create(girls[i].getFrontFile());
+        _portrait.push_back(portrait);
+        if (portrait == nullptr)
+        {
+            problemLoading(girls[i].getFrontFile().c_str());
+        }
+        else
+        {
+            portrait->setPosition(Vec2(portraitX, portraitY));
+            portrait->setScale(portraitWidth / _portrait[i]->getContentSize().width,
+                                   portraitHeight / _portrait[i]->getContentSize().height);
+            this->addChild(_portrait[i], 2);
+        }
+
+        auto flipButton1 = UI::Helper::createButton(
+            "Button.png",
+            "",
+            "",
+            "FLIP",
+            portraitX - (50 + margin),
+            portraitY - portraitHeight / 2 - (20 + margin),
+            100,
+            40,
+            AX_CALLBACK_1(MainScene::flipCallback, this, i));
+
+        if (flipButton1 == nullptr)
+        {
+            problemLoading("'Button.png'");
+        }
+        else
+        {
+            flipButton1->setTag(static_cast<int>(i));
+            this->addChild(flipButton1, 2);
+        }
+
+        auto nextButton1 = UI::Helper::createButton(
+            "Button.png",
+            "",
+            "",
+            "NEXT",
+            portraitX + (50 + margin),
+            portraitY - portraitHeight / 2 - (20 + margin),
+            100,
+            40,
+            AX_CALLBACK_1(MainScene::nextCallback, this, i));
+
+        if (nextButton1 == nullptr)
+        {
+            problemLoading("'Button.png'");
+        }
+        else
+        {
+            nextButton1->setTag(static_cast<int>(i));
+            this->addChild(nextButton1, 2);
+        }
     }
 
-    auto flipButton1 = UI::Helper::createButton("Button.png", "", "", "START", leftX, startY, 100, 40,
-                                                AX_CALLBACK_1(MainScene::flipCallback, this));
-
-    if (flipButton1 == nullptr)
-    {
-        problemLoading("'Button.png'");
-    }
-    else
-    {
-        this->addChild(flipButton1, 2);
-    }
-
-    // Create second portrait zone
-    _portrait2 = Sprite::create("Fe/Fe002/Out004/000_f.png");
-    if (_portrait2 == nullptr)
-    {
-        problemLoading("'Fe/Fe002/Out004/000_f.png'");
-    }
-    else
-    {
-        _portrait2->setPosition(Vec2(rightX, startY));
-        _portrait2->setScale(portraitWidth / _portrait2->getContentSize().width,
-                             portraitHeight / _portrait2->getContentSize().height);
-        this->addChild(_portrait2, 2);
-    }
-
-    auto flipButton2 = UI::Helper::createButton("Button.png", "", "", "START", rightX, startY, 100, 40,
-                                                AX_CALLBACK_1(MainScene::flipCallback, this));
-
-    if (flipButton2 == nullptr)
-    {
-        problemLoading("'Button.png'");
-    }
-    else
-    {
-        this->addChild(flipButton2, 2);
-    }
 }
 
 void MainScene::update(float delta) {}
@@ -196,9 +202,18 @@ void MainScene::menuCloseCallback(ax::Object* sender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 }
 
-void MainScene::flipCallback(ax::Object* sender)
+void MainScene::flipCallback(ax::Object* sender, int index)
 {
-    AXLOG("Flip button clicked");
+    AXLOG("Flip button clicked, index: %d", index);
+    GameData::getInstance()->getGirls()[index].flip();
+    _portrait[index]->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
+}
+
+void MainScene::nextCallback(ax::Object* sender, int index)
+{
+    AXLOG("Next button clicked, index: %d", index);
+    GameData::getInstance()->getGirls()[index].undress();
+    _portrait[index]->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
 }
 
 MainScene::MainScene()
