@@ -11,7 +11,7 @@ public:
     std::string getCurrentFile() const;
 
     void flip();
-    void undress();
+    bool undress();
 
 private:
 

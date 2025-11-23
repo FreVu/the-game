@@ -13,7 +13,7 @@ public:
     std::string getFrontFile();
 
     void flip();
-    void undress();
+    bool undress();
 
 private:
 

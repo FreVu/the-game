@@ -1,4 +1,4 @@
-#include "MainScene.h"
+#include "StripGameScene.h"
 
 #include "StartMenu.h"
 #include "UI/UIButton.h"
@@ -13,7 +13,7 @@ static void problemLoading(const char* filename)
     printf("Error while loading: %s\n", filename);
     printf(
         "Depending on how you compiled you might have to add 'Content/' in front of filenames in "
-        "MainScene.cpp\n");
+        "StripGameScene.cpp\n");
 }
 
 // on "init" you need to initialize your instance
@@ -95,14 +95,6 @@ bool StartMenu::init()
     mouseListener->onMouseScroll = AX_CALLBACK_1(StartMenu::onMouseScroll, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
 
-    // auto keyboardListener           = EventListenerKeyboard::create();
-    // keyboardListener->onKeyPressed  = AX_CALLBACK_2(MainScene::onKeyPressed, this);
-    // keyboardListener->onKeyReleased = AX_CALLBACK_2(MainScene::onKeyReleased, this);
-    //_eventDispatcher->addEventListenerWithFixedPriority(keyboardListener, 11);
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-
     //// add "HelloWorld" splash screen"
     // auto sprite = Sprite::create("HelloWorld.png"sv);
     // if (sprite == nullptr)
@@ -129,33 +121,6 @@ bool StartMenu::init()
 
     return true;
 }
-
-// void StartMenu::onTouchesBegan(const std::vector<ax::Touch*>& touches, ax::Event* event)
-//{
-//     for (auto&& t : touches)
-//     {
-//         AXLOG("onTouchesBegan detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
-//     }
-// }
-//
-// void StartMenu::onTouchesMoved(const std::vector<ax::Touch*>& touches, ax::Event* event)
-//{
-//     for (auto&& t : touches)
-//     {
-//         AXLOG("onTouchesMoved detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
-//     }
-// }
-//
-// void StartMenu::onTouchesEnded(const std::vector<ax::Touch*>& touches, ax::Event* event)
-//{
-//     for (auto&& t : touches)
-//     {
-//         AXLOG("onTouchesEnded detected, X:%f  Y:%f", t->getLocation().x, t->getLocation().y);
-//     }
-//
-//_director->replaceScene(utils::createInstance<MainScene>());
-// this->getEventDispatcher()->removeAllEventListeners();
-//}
 
 void StartMenu::onMouseDown(Event* event)
 {
@@ -272,5 +237,5 @@ void StartMenu::menuStartCallback(ax::Object* sender)
 {
     AXLOG("Start button clicked");
     //this->getEventDispatcher()->removeAllEventListeners();
-    _director->replaceScene(utils::createInstance<MainScene>());
+    _director->replaceScene(utils::createInstance<StripGameScene>());
 }

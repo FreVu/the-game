@@ -3,6 +3,7 @@
 #include "Girl.h"
 
 #include <vector>
+#include <utility>
 
 class GameData
 {
@@ -13,6 +14,7 @@ public:
 
     std::vector<Girl> getGirls();
     void addGirl(Girl girl);
+    std::pair<Girl*, size_t> getRandomGirl();
 
 private:
 

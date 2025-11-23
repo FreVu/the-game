@@ -19,7 +19,7 @@ void Girl::flip()
     _outfit->flip();
 }
 
-void Girl::undress()
+bool Girl::undress()
 {
-    _outfit->undress();
+    return _outfit->undress();
 }

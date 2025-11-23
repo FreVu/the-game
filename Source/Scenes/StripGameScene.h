@@ -4,7 +4,7 @@
 
 #include "Engine/Girl.h"
 
-class MainScene : public ax::Scene
+class StripGameScene : public ax::Scene
 {
 public:
     bool init() override;
@@ -31,10 +31,23 @@ public:
     // Portrait zones
     void createPortraitZones();
 
-    MainScene();
-    ~MainScene();
+    StripGameScene();
+    ~StripGameScene();
 
 private:
+
+    class TurnBets
+    {
+        public:
+
+            int _girlAttack;
+            int _girlDefense;
+
+            int _protagonistAttack;
+            int _protagonistDefense;
+    };
+
+    std::vector<TurnBets> _turnBets;
 
     // Portrait zones
     std::vector<ax::Sprite*> _portrait;
@@ -44,5 +57,6 @@ private:
     ax::EventListenerMouse* _mouseListener          = nullptr;
 
     void flipCallback(ax::Object* sender, int index);
-    void nextCallback(ax::Object* sender, int index);
+    void lost(ax::Object* sender, int index);
+    void randomNext(ax::Object* sender);
 };

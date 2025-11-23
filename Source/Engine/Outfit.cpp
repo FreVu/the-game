@@ -17,7 +17,8 @@ void Outfit::flip()
     _front = !_front;
 }
 
-void Outfit::undress()
+bool Outfit::undress()
 {
     _currentStep = FileSystemHelper::getRandomNumberFromSection(_directory.path().string() + "/steps.txt", _currentStep);
+    return _currentStep >= 0;
 }
