@@ -123,7 +123,7 @@ void StripGameScene::createPortraitZones()
 
     float portraitY = screenOrigin.y + screenSize.height - portraitHeight / 2 - 50;
 
-    auto next = UI::Helper::createButton("Button.png", "", "", "NEXT", screenSize.x / 2, screenSize.y / 4, 100, 40,
+    auto next = UIHelper::Helper::createButton("Button.png", "", "", "NEXT", screenSize.x / 2, screenSize.y / 4, 100, 40,
                                          AX_CALLBACK_1(StripGameScene::randomNext, this));
 
     if (next == nullptr)
@@ -139,49 +139,125 @@ void StripGameScene::createPortraitZones()
     auto girls = GameData::getInstance()->getGirls();
     for (unsigned i = 0; i < girls.size(); i++)
     {
+        GirlData data;
+
         float portraitX = screenOrigin.x + screenSize.width * (i + 1) / (girls.size() + 1);
 
-        auto portrait = Sprite::create(girls[i].getFrontFile());
-        _portrait.push_back(portrait);
-        if (portrait == nullptr)
+        data._portrait = Sprite::create(girls[i].getFrontFile());
+        if (data._portrait == nullptr)
         {
             problemLoading(girls[i].getFrontFile().c_str());
         }
         else
         {
-            portrait->setPosition(Vec2(portraitX, portraitY));
-            portrait->setScale(portraitWidth / _portrait[i]->getContentSize().width,
-                               portraitHeight / _portrait[i]->getContentSize().height);
-            this->addChild(_portrait[i], 2);
+            data._portrait->setPosition(Vec2(portraitX, portraitY));
+            data._portrait->setScale(portraitWidth / data._portrait->getContentSize().width,
+                                     portraitHeight / data._portrait->getContentSize().height);
+            this->addChild(data._portrait, 2);
         }
 
-        auto flipButton1 = UI::Helper::createButton("Button.png", "", "", "FLIP", portraitX - (50 + margin),
-                                                    portraitY - portraitHeight / 2 - (20 + margin), 100, 40,
+        // Create FLIP button centered and with same width as portrait
+        auto flipButton = UIHelper::Helper::createButton("Button.png", "", "", "FLIP", 
+                                                    static_cast<int>(portraitX),
+                                                    static_cast<int>(portraitY - portraitHeight / 2 - (20 + margin)), 
+                                                    static_cast<int>(portraitWidth), 40,
                                                     AX_CALLBACK_1(StripGameScene::flipCallback, this, i));
 
-        if (flipButton1 == nullptr)
+        if (flipButton == nullptr)
         {
             problemLoading("'Button.png'");
         }
         else
         {
-            flipButton1->setTag(static_cast<int>(i));
-            this->addChild(flipButton1, 2);
+            flipButton->setTag(static_cast<int>(i));
+            this->addChild(flipButton, 2);
         }
 
-        auto nextButton1 = UI::Helper::createButton("Button.png", "", "", "UNDRESS", portraitX + (50 + margin),
-                                                    portraitY - portraitHeight / 2 - (20 + margin), 100, 40,
-                                                    AX_CALLBACK_1(StripGameScene::lost, this, i));
+        // Control parameters
+        const int buttonSizeX = 30;
+        const int buttonSizeY = 30;
+        const int labelWidth = 30;
+        const int spacing = 5;
+        const int iconSize = 30;
+        
+        // Position displays and controls side by side
+        const int controlSpacing = 50;
+        const int controlWidth = buttonSizeX + spacing + labelWidth + spacing + iconSize + spacing + buttonSizeX; // button + spacing + label + spacing + icon + spacing + button
+        float attackControlX = portraitX - controlWidth / 2 - controlSpacing / 2;
+        float defenseControlX = portraitX + controlWidth / 2 + controlSpacing / 2;
+        
+        // Create displays just under the FLIP button
+        float displayY = portraitY - portraitHeight / 2 - (20 + margin) - 40 - margin;
+        float attackDisplayX  = defenseControlX;
+        float defenseDisplayX = attackControlX;
+        
+        data._attackDisplay = UIHelper::Helper::createValueDisplay(0,
+                                                                   static_cast<int>(attackDisplayX),
+                                                                   static_cast<int>(displayY),
+                                                                   labelWidth,
+                                                                   "",
+                                                                   "Attack.png");
 
-        if (nextButton1 == nullptr)
+        if (data._attackDisplay == nullptr)
+        {
+            problemLoading("'Attack.png'");
+        }
+        else
+        {
+            data._attackDisplay->setTag(static_cast<int>(i));
+            this->addChild(data._attackDisplay, 2);
+        }
+
+        data._defenseDisplay = UIHelper::Helper::createValueDisplay(0,
+                                                                      static_cast<int>(defenseDisplayX),
+                                                                      static_cast<int>(displayY),
+                                                                      labelWidth,
+                                                                      "",
+                                                                      "Defence.png");
+
+        if (data._defenseDisplay == nullptr)
+        {
+            problemLoading("'Defence.png'");
+        }
+        else
+        {
+            data._defenseDisplay->setTag(static_cast<int>(i));
+            this->addChild(data._defenseDisplay, 2);
+        }
+
+        // Create controls under the displays
+        float controlY = displayY - iconSize - margin;
+        
+        data._attackControl = UIHelper::Helper::createIntegerControl("Button.png", 0, 0, 5, 
+                                                                static_cast<int>(attackControlX), 
+                                                                static_cast<int>(controlY), buttonSizeX, buttonSizeY, labelWidth, "", "Attack.png");
+
+        if (data._attackControl == nullptr)
         {
             problemLoading("'Button.png'");
         }
         else
         {
-            nextButton1->setTag(static_cast<int>(i));
-            this->addChild(nextButton1, 2);
+            data._attackControl->setTag(static_cast<int>(i));
+            this->addChild(data._attackControl, 2);
         }
+
+        // Create Defense control next to the attack control
+        data._defenseControl = UIHelper::Helper::createIntegerControl("Button.png", 0, 0, 5, 
+                                                                static_cast<int>(defenseControlX), 
+                                                                static_cast<int>(controlY), buttonSizeX, buttonSizeY, labelWidth, "", "Defence.png");
+
+        if (data._defenseControl == nullptr)
+        {
+            problemLoading("'Button.png'");
+        }
+        else
+        {
+            data._defenseControl->setTag(static_cast<int>(i));
+            this->addChild(data._defenseControl, 2);
+        }
+
+        _girlData.push_back(data);
     }
 
     // Create END TURN button in lower right corner
@@ -190,7 +266,7 @@ void StripGameScene::createPortraitZones()
     float endTurnX = screenOrigin.x + screenSize.width - buttonWidth / 2 - margin;
     float endTurnY = screenOrigin.y + buttonHeight / 2 + margin;
 
-    auto endTurnButton = UI::Helper::createButton("Button.png", "", "", "END TURN", endTurnX, endTurnY, buttonWidth, buttonHeight,
+    auto endTurnButton = UIHelper::Helper::createButton("Button.png", "", "", "END TURN", endTurnX, endTurnY, buttonWidth, buttonHeight,
                                                   AX_CALLBACK_1(StripGameScene::endTurnCallback, this, 0));
 
     if (endTurnButton == nullptr)
@@ -222,7 +298,7 @@ void StripGameScene::flipCallback(ax::Object* sender, int index)
 {
     AXLOG("Flip button clicked, index: %d", index);
     GameData::getInstance()->getGirls()[index].flip();
-    _portrait[index]->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
+    _girlData[index]._portrait->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
 }
 
 void StripGameScene::lost(ax::Object* sender, int index)
@@ -231,7 +307,7 @@ void StripGameScene::lost(ax::Object* sender, int index)
 
     if (GameData::getInstance()->getGirls()[index].undress())
     {
-        _portrait[index]->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
+        _girlData[index]._portrait->setTexture(GameData::getInstance()->getGirls()[index].getFrontFile());
     }
     else
     {
@@ -246,7 +322,7 @@ void StripGameScene::randomNext(ax::Object* sender)
 
     if (girl->undress())
     {
-        _portrait[index]->setTexture(girl->getFrontFile());
+        _girlData[index]._portrait->setTexture(girl->getFrontFile());
     }
     else
     {

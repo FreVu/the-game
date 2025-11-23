@@ -1,8 +1,9 @@
 #pragma once
 
-#include "axmol.h"
-
 #include "Engine/Girl.h"
+#include "UI/Helper.hpp"
+
+#include "axmol.h"
 
 class StripGameScene : public ax::Scene
 {
@@ -36,21 +37,24 @@ public:
 
 private:
 
-    class TurnBets
+    class GirlData
     {
         public:
 
+            ax::Sprite* _portrait;
+
+            UIHelper::IntegerControl* _attackControl;
+            UIHelper::IntegerControl* _defenseControl;
+
+            UIHelper::ValueDisplay* _attackDisplay;
+            UIHelper::ValueDisplay* _defenseDisplay;
+
             int _girlAttack;
             int _girlDefense;
-
-            int _protagonistAttack;
-            int _protagonistDefense;
     };
 
-    std::vector<TurnBets> _turnBets;
-
     // Portrait zones
-    std::vector<ax::Sprite*> _portrait;
+    std::vector<GirlData> _girlData;
 
     ax::EventListenerTouchAllAtOnce* _touchListener = nullptr;
     ax::EventListenerKeyboard* _keyboardListener    = nullptr;

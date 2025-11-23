@@ -5,8 +5,6 @@
 
 #include "UI/Helper.hpp"
 
-USING_NS_AX;
-
 // Print useful error message instead of segfaulting when files are not there.
 static void problemLoading(const char* filename)
 {
@@ -33,7 +31,7 @@ bool StartMenu::init()
     auto safeOrigin = safeArea.origin;
 
     // TITLE
-    auto title = Label::createWithTTF("THE GAME", "fonts/Arial.ttf", 24);
+    auto title = ax::Label::createWithTTF("THE GAME", "fonts/Arial.ttf", 24);
     if (title == nullptr)
     {
         problemLoading("'fonts/Arial.ttf'");
@@ -41,7 +39,7 @@ bool StartMenu::init()
     else
     {
         title->setPosition(
-            Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - title->getContentSize().height));
+            ax::Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - title->getContentSize().height));
         this->addChild(title, 1);
     }
 
@@ -49,7 +47,7 @@ bool StartMenu::init()
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
-    auto startButton = UI::Helper::createButton(
+    auto startButton = UIHelper::Helper::createButton(
         "Button.png", "", "", "START", safeOrigin.x + safeArea.size.width / 2 - 50,
         safeOrigin.y + safeArea.size.height / 2 - 20, 100, 40, AX_CALLBACK_1(StartMenu::menuStartCallback, this));
 
@@ -66,7 +64,7 @@ bool StartMenu::init()
     float x = safeOrigin.x + safeArea.size.width - 40;
     float y = safeOrigin.y + 40;
 
-    auto closeItem = UI::Helper::createButton("Quit.png", "", "", "", x, y, 40, 40,
+    auto closeItem = UIHelper::Helper::createButton("Quit.png", "", "", "", x, y, 40, 40,
                                               AX_CALLBACK_1(StartMenu::menuCloseCallback, this));
 
     if (closeItem == nullptr)
@@ -88,7 +86,7 @@ bool StartMenu::init()
     // touchListener->onTouchesEnded = AX_CALLBACK_2(StartMenu::onTouchesEnded, this);
     //_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
 
-    auto mouseListener           = EventListenerMouse::create();
+    auto mouseListener           = ax::EventListenerMouse::create();
     mouseListener->onMouseMove   = AX_CALLBACK_1(StartMenu::onMouseMove, this);
     mouseListener->onMouseUp     = AX_CALLBACK_1(StartMenu::onMouseUp, this);
     mouseListener->onMouseDown   = AX_CALLBACK_1(StartMenu::onMouseDown, this);
@@ -122,30 +120,30 @@ bool StartMenu::init()
     return true;
 }
 
-void StartMenu::onMouseDown(Event* event)
+void StartMenu::onMouseDown(ax::Event* event)
 {
-    EventMouse* e = static_cast<EventMouse*>(event);
+    ax::EventMouse* e = static_cast<ax::EventMouse*>(event);
     AXLOG("onMouseDown detected, Key: %d", static_cast<int>(e->getMouseButton()));
 }
 
-void StartMenu::onMouseUp(Event* event)
+void StartMenu::onMouseUp(ax::Event* event)
 {
-    EventMouse* e = static_cast<EventMouse*>(event);
+    ax::EventMouse* e = static_cast<ax::EventMouse*>(event);
     AXLOG("onMouseUp detected, Key: %d", static_cast<int>(e->getMouseButton()));
 
     //_director->replaceScene(utils::createInstance<MainScene>());
     // this->getEventDispatcher()->removeAllEventListeners();
 }
 
-void StartMenu::onMouseMove(Event* event)
+void StartMenu::onMouseMove(ax::Event* event)
 {
-    EventMouse* e = static_cast<EventMouse*>(event);
+    ax::EventMouse* e = static_cast<ax::EventMouse*>(event);
     AXLOG("onMouseMove detected, X:%f  Y:%f", e->getCursorX(), e->getCursorY());
 }
 
-void StartMenu::onMouseScroll(Event* event)
+void StartMenu::onMouseScroll(ax::Event* event)
 {
-    EventMouse* e = static_cast<EventMouse*>(event);
+    ax::EventMouse* e = static_cast<ax::EventMouse*>(event);
     AXLOG("onMouseScroll detected, X:%f  Y:%f", e->getScrollX(), e->getScrollY());
 }
 //
@@ -237,5 +235,5 @@ void StartMenu::menuStartCallback(ax::Object* sender)
 {
     AXLOG("Start button clicked");
     //this->getEventDispatcher()->removeAllEventListeners();
-    _director->replaceScene(utils::createInstance<StripGameScene>());
+    _director->replaceScene(ax::utils::createInstance<StripGameScene>());
 }
