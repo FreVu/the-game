@@ -59,4 +59,5 @@ private:
     void flipCallback(ax::Object* sender, int index);
     void lost(ax::Object* sender, int index);
     void randomNext(ax::Object* sender);
+    void endTurnCallback(ax::Object* sender, int index);
 };

@@ -183,6 +183,24 @@ void StripGameScene::createPortraitZones()
             this->addChild(nextButton1, 2);
         }
     }
+
+    // Create END TURN button in lower right corner
+    const int buttonWidth = 100;
+    const int buttonHeight = 40;
+    float endTurnX = screenOrigin.x + screenSize.width - buttonWidth / 2 - margin;
+    float endTurnY = screenOrigin.y + buttonHeight / 2 + margin;
+
+    auto endTurnButton = UI::Helper::createButton("Button.png", "", "", "END TURN", endTurnX, endTurnY, buttonWidth, buttonHeight,
+                                                  AX_CALLBACK_1(StripGameScene::endTurnCallback, this, 0));
+
+    if (endTurnButton == nullptr)
+    {
+        problemLoading("'Button.png'");
+    }
+    else
+    {
+        this->addChild(endTurnButton, 2);
+    }
 }
 
 void StripGameScene::update(float delta) {}
@@ -233,6 +251,18 @@ void StripGameScene::randomNext(ax::Object* sender)
     else
     {
         // lost
+    }
+}
+
+void StripGameScene::endTurnCallback(ax::Object* sender, int index)
+{
+    AXLOG("END TURN button clicked, index: %d", index);
+    // Access model similar to flipCallback
+    auto girls = GameData::getInstance()->getGirls();
+    if (index >= 0 && index < static_cast<int>(girls.size()))
+    {
+        // End turn logic can be added here
+        // For now, following the pattern of flipCallback
     }
 }
 
